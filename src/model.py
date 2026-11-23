@@ -8,16 +8,45 @@ class MyModel(nn.Module):
 
         super().__init__()
 
-        # YOUR CODE HERE
-        # Define a CNN architecture. Remember to use the variable num_classes
-        # to size appropriately the output of your classifier, and if you use
-        # the Dropout layer, use the variable "dropout" to indicate how much
-        # to use (like nn.Dropout(p=dropout))
+        # Feature extractor: 5 blocks of Conv -> BatchNorm -> ReLU -> MaxPool.
+        # Each block halves the spatial resolution and doubles the number of
+        # feature maps: 3x224x224 -> 16x112x112 -> 32x56x56 -> 64x28x28
+        # -> 128x14x14 -> 256x7x7
+        self.features = nn.Sequential(
+            self._conv_block(3, 16),
+            self._conv_block(16, 32),
+            self._conv_block(32, 64),
+            self._conv_block(64, 128),
+            self._conv_block(128, 256),
+        )
+
+        # Classifier head (MLP). The amount of dropout is controlled by the
+        # "dropout" parameter, and the output size by "num_classes"
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Dropout(p=dropout),
+            nn.Linear(256 * 7 * 7, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Dropout(p=dropout),
+            nn.Linear(512, num_classes),
+        )
+
+    @staticmethod
+    def _conv_block(in_channels: int, out_channels: int) -> nn.Sequential:
+        return nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # YOUR CODE HERE: process the input tensor through the
-        # feature extractor, the pooling and the final linear
-        # layers (if appropriate for the architecture chosen)
+        # Process the input through the feature extractor, then flatten and
+        # pass it through the classifier. No softmax here: CrossEntropyLoss
+        # expects raw logits
+        x = self.features(x)
+        x = self.classifier(x)
         return x
 
 

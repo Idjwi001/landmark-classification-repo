@@ -1,0 +1,6 @@
+landmark_images/
+checkpoints/*.pt
+mean_and_std.pt
+__pycache__/
+.ipynb_checkpoints/
+submission_*.tar.gz
