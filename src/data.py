@@ -38,7 +38,7 @@ def get_data_loaders(
     mean, std = compute_mean_and_std()
     print(f"Dataset mean: {mean}, std: {std}")
 
-    # YOUR CODE HERE:
+    # 
     # create 3 sets of data transforms: one for the training dataset,
     # containing data augmentation, one for the validation dataset
     # (without data augmentation) and one for the test set (again
@@ -152,7 +152,7 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
     :return: None
     """
 
-    # YOUR CODE HERE:
+    # 
     # obtain one batch of training images
     # First obtain an iterator from the train dataloader
     dataiter = iter(data_loaders["train"])
@@ -171,7 +171,7 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
 
     images = invTrans(images)
 
-    # YOUR CODE HERE:
+    # 
     # Get class names from the train data loader
     class_names = data_loaders["train"].dataset.classes
 
